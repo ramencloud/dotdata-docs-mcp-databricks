@@ -1,10 +1,19 @@
 """Databricks App entry point for the dotdata-docs MCP server (streamable-http)."""
 
+import logging
 import os
+import sys
 
 from starlette.middleware.cors import CORSMiddleware
 
+from dotdata_docs_mcp.error_reporting import ExceptionLoggingMiddleware
 from dotdata_docs_mcp.server import mcp
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+    stream=sys.stderr,
+)
 
 _databricks_host = os.environ.get("DATABRICKS_HOST", "").strip().rstrip("/")
 _allowed_origins = (
@@ -15,6 +24,7 @@ _allowed_origins = (
 
 app = mcp.streamable_http_app()
 
+app.add_middleware(ExceptionLoggingMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_allowed_origins or ["*"],

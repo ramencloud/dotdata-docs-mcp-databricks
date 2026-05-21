@@ -1,1 +1,1 @@
-# Intentionally empty — no pip install during build.
+dotdata-docs-mcp==0.1.3

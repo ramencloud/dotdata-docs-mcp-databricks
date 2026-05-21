@@ -22,6 +22,9 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    log(f"importing mcp...")
+    from dotdata_docs_mcp.server import mcp
+    log(f"importing mcp successful")
     log("hello world")
     log(f"listening on 0.0.0.0:{PORT}")
     HTTPServer(("0.0.0.0", PORT), Handler).serve_forever()

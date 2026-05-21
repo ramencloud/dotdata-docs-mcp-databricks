@@ -1,24 +1,27 @@
-"""Databricks App entry point for the dotdata-docs MCP server (streamable-http)."""
+"""Step 1: prove git deploy, process start, and HTTP bind on PORT."""
 
 import os
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
-from starlette.middleware.cors import CORSMiddleware
+PORT = int(os.environ.get("PORT", "8000"))
 
-from dotdata_docs_mcp.server import mcp
 
-_databricks_host = os.environ.get("DATABRICKS_HOST", "").strip().rstrip("/")
-_allowed_origins = (
-    [_databricks_host if _databricks_host.startswith("https://") else f"https://{_databricks_host}"]
-    if _databricks_host
-    else [o.strip() for o in os.environ.get("MCP_ALLOWED_ORIGINS", "").split(",") if o.strip()]
-)
+def log(msg: str) -> None:
+    print(f"[step01] {msg}", flush=True)
 
-app = mcp.streamable_http_app()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=_allowed_origins or ["*"],
-    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
-    expose_headers=["Mcp-Session-Id"],
-)
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self) -> None:
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain")
+        self.end_headers()
+        self.wfile.write(b"hello")
+
+    def log_message(self, fmt: str, *args) -> None:
+        log(f"HTTP {self.address_string()} - {fmt % args}")
+
+
+if __name__ == "__main__":
+    log("hello world")
+    log(f"listening on 0.0.0.0:{PORT}")
+    HTTPServer(("0.0.0.0", PORT), Handler).serve_forever()

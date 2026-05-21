@@ -2,3 +2,6 @@
 command:
   - python
   - main.py
+env:
+  - name: PIP_EXTRA_INDEX_URL
+    valueFrom: extra-index-url
